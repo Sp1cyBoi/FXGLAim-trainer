@@ -17,6 +17,7 @@ import com.almasb.fxgl.ui.ProgressBar;
 import com.leewyatt.github.tank.components.EnemyComponent;
 import com.leewyatt.github.tank.components.FlagViewComponent;
 import com.leewyatt.github.tank.components.PlayerComponent;
+import com.leewyatt.github.tank.components.PointComponent;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -25,11 +26,19 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author LeeWyatt
- * 产生实体的工具类
- */
 public class GameEntityFactory implements EntityFactory {
+
+
+    @Spawns("point")
+    public Entity newPoint(SpawnData data) {
+        return FXGL.entityBuilder(data)
+                .type(GameType.ENEMY)
+                .bbox(BoundingShape.circle(40))
+                .view("ui/fadenkreuz.png")
+                .with(new PointComponent())
+                .collidable()
+                .build();
+    }
 
     @Spawns("player")
     public Entity newPlayer(SpawnData data) {

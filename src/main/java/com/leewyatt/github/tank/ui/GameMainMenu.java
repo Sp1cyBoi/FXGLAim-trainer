@@ -8,13 +8,13 @@ import com.almasb.fxgl.input.view.KeyView;
 import com.almasb.fxgl.texture.Texture;
 import com.almasb.fxgl.ui.DialogService;
 import javafx.animation.TranslateTransition;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
@@ -31,14 +31,19 @@ public class GameMainMenu extends FXGLMenu {
     private final TranslateTransition tt;
     private final Pane defaultPane;
 
+
     public GameMainMenu() {
         super(MenuType.MAIN_MENU);
-        Texture texture = texture("ui/logo.png");
-        texture.setLayoutX(144);
-        texture.setLayoutY(160);
+
+
+        Texture texture = texture("ui/aimtrainer_logo.jpg");
+        texture.setLayoutX(10);
+        texture.setLayoutY(10);
+        texture.setFitWidth(getAppWidth()-20);
+        texture.setFitHeight((getAppWidth()-20) * 0.25);
 
         MainMenuButton newGameBtn = new MainMenuButton("START GAME", this::fireNewGame);
-        MainMenuButton constructBtn = new MainMenuButton("CONSTRUCT", () -> {
+        MainMenuButton constructBtn = new MainMenuButton("SETTINGS", () -> {
             getContentRoot().getChildren().setAll(new ConstructPane());
         });
         MainMenuButton helpBtn = new MainMenuButton("HELP", this::instructions);
@@ -54,30 +59,31 @@ public class GameMainMenu extends FXGLMenu {
                 exitBtn
         );
         menuBox.setAlignment(Pos.CENTER_LEFT);
-        menuBox.setLayoutX(240);
-        menuBox.setLayoutY(360);
+        menuBox.setLayoutX(150);
+        menuBox.setLayoutY(200);
         menuBox.setVisible(false);
 
-        Texture tankTexture = FXGL.texture("ui/tankLoading.png");
 
-        tt = new TranslateTransition(Duration.seconds(2), tankTexture);
+
+        tt = new TranslateTransition(Duration.seconds(2), texture);
         tt.setInterpolator(Interpolators.ELASTIC.EASE_OUT());
-        tt.setFromX(172);
-        tt.setFromY(252);
-        tt.setToX(374);
-        tt.setToY(252);
+        tt.setFromX(-100);
+        tt.setFromY(10);
+        tt.setToX(10);
+        tt.setToY(10);
         tt.setOnFinished(e -> menuBox.setVisible(true));
 
-        Rectangle bgRect = new Rectangle(getAppWidth(), getAppHeight());
-        Line line = new Line(30, 580, 770, 580);
-        line.setStroke(Color.web("#B9340D"));
-        line.setStrokeWidth(2);
-        Texture textureWall = texture("ui/fxgl.png");
-        textureWall.setLayoutX(310);
-        textureWall.setLayoutY(600);
+        Rectangle bgRect = new Rectangle(getAppWidth(), getAppHeight(), Color.WHITE);
 
-        defaultPane = new Pane(bgRect, texture, tankTexture, menuBox, line, textureWall);
+        Line line = new Line(30, 580, 770, 580);
+        line.setStroke(Color.web("#FF0000"));
+        line.setStrokeWidth(2);
+
+
+        defaultPane = new Pane(bgRect, texture, menuBox, line);
+        defaultPane.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
         getContentRoot().getChildren().setAll(defaultPane);
+
     }
 
     @Override

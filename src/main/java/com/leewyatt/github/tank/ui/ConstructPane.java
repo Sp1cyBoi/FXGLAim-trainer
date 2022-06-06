@@ -330,7 +330,7 @@ public class ConstructPane extends BorderPane {
 
     private void drawMap() {
         GraphicsContext g = canvas.getGraphicsContext2D();
-        g.setFill(Color.BLACK);
+        g.setFill(Color.WHITE);
         g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         //draw grid 绘制直线网格
         if (showGrid) {

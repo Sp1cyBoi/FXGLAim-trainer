@@ -39,31 +39,11 @@ public class InfoPane extends Pane {
         levelText.setLayoutY(520);
         levelText.textProperty().bind(getip("level").asString());
 
-        Texture b1 = texture("ui/bulletLevel.png");
-        b1.setVisible(false);
-        Texture b2 = texture("ui/bulletLevel.png");
-        b2.setVisible(false);
-        Texture b3 = texture("ui/bulletLevel.png");
-        b3.setVisible(false);
-        HBox box = new HBox(5,b1,b2,b3);
-        box.setLayoutX(15);
-        box.setLayoutY(560);
-        ObservableList<Node> bulletLevelNodes = box.getChildren();
-        int bulletLevel = geti("playerBulletLevel");
-        for (int i = 0; i < bulletLevel; i++) {
-            bulletLevelNodes.get(i).setVisible(true);
-        }
-        getip("playerBulletLevel").addListener((ob, ov, nv) ->{
-            for (int i = 0; i < nv.intValue(); i++) {
-                bulletLevelNodes.get(i).setVisible(true);
-            }
-        });
-
-        getChildren().addAll(tilePane, levelFlag, levelText,box);
+        getChildren().addAll(tilePane, levelFlag, levelText);
         setPrefSize(24 * 6, 24 * 28);
         setLayoutX(24 * 28);
         setLayoutY(0);
-        setStyle("-fx-background-color: #666666");
+        setStyle("-fx-background-color: #ffffff");
 
         ObservableList<Node> enemyPreNodes = tilePane.getChildren();
         getip("spawnedEnemy").addListener((ob, ov, nv) -> {

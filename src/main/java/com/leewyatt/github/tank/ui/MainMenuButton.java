@@ -14,7 +14,7 @@ import static com.almasb.fxgl.dsl.FXGL.texture;
 public class MainMenuButton extends RadioButton {
 
     public MainMenuButton(String text, Runnable action) {
-        Texture texture = texture("ui/icon.png");
+        Texture texture = texture("ui/fadenkreuz.png");
         texture.setRotate(180);
         texture.setVisible(false);
         setGraphic(texture);
