@@ -2,6 +2,7 @@ package com.leewyatt.github.tank;
 
 import javafx.application.Platform;
 
+
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -15,6 +16,7 @@ public class GameClient {
     private Consumer<String> waitHandler;
     private Consumer<Exception> errorHandler;
     private Consumer<String> pointHandler;
+    private Consumer<String> scoreHandler;
 
     public GameClient(String serverIp, int i) {
         this.serverIp = serverIp;
@@ -46,6 +48,10 @@ public class GameClient {
                         if (s.startsWith("POINT:")) {
                             String params = s.substring(6);
                             Platform.runLater(()->{this.pointHandler.accept(params);});
+                        }
+                        if (s.startsWith("SCORE:")) {
+                            String params = s.substring(6);
+                            Platform.runLater(()->{this.scoreHandler.accept(params);});
                         }
                     }
                 } catch (IOException e) {
@@ -82,18 +88,22 @@ public class GameClient {
         this.errorHandler = consumer;
     }
 
+    public void setScoreHandler(Consumer<String> consumer) {
+        this.scoreHandler = consumer;
+    }
+
     public void start() {
-        try {
             send("START:2");
+    }
+
+    public void send(String message) {
+        try {
+            wr.write(message + "\n");
+            wr.flush();
         } catch (IOException e) {
             e.printStackTrace();
             errorHandler.accept(e);
         }
-    }
-
-    public void send(String message) throws IOException {
-        wr.write(message + "\n");
-        wr.flush();
     }
 
 

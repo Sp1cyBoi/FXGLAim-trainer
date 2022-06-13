@@ -8,11 +8,24 @@ import java.net.Socket;
 public class ClientHandler extends Thread{
     private final Game game;
     BufferedWriter wr;
-    Socket client;
+    protected Socket client;
 
     public ClientHandler(Socket s, Game game) {
         client = s;
         this.game = game;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClientHandler that = (ClientHandler) o;
+        return client.equals(that.client);
+    }
+
+    @Override
+    public int hashCode() {
+        return client.hashCode();
     }
 
     @Override
@@ -27,8 +40,10 @@ public class ClientHandler extends Thread{
                 if( s.startsWith("START:")) {
                     Platform.runLater(()->{game.startRequest(2, this);});
                 }
-                if( s.startsWith("WAIT:")) {
-
+                if( s.startsWith("HIT:")) {
+                    String[] par = s.split(":");
+                    System.out.println(this.hashCode() + ": " + s);
+                    Platform.runLater(()->{game.hit(this,par[1], Integer.valueOf(par[2]));});
                 }
             }
 

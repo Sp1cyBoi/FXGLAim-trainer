@@ -8,6 +8,7 @@ import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.app.scene.*;
 import com.almasb.fxgl.core.math.FXGLMath;
 import com.almasb.fxgl.core.util.LazyValue;
+import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.dsl.components.EffectComponent;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.SpawnData;
@@ -16,6 +17,7 @@ import com.almasb.fxgl.entity.level.tiled.TMXLevelLoader;
 import com.almasb.fxgl.time.TimerAction;
 import com.leewyatt.github.tank.collision.*;
 import com.leewyatt.github.tank.components.PlayerComponent;
+import com.leewyatt.github.tank.components.PointComponent;
 import com.leewyatt.github.tank.effects.HelmetEffect;
 import com.leewyatt.github.tank.ui.*;
 import javafx.animation.KeyFrame;
@@ -223,6 +225,10 @@ public class TankApp extends GameApplication {
         String[] parArr = params.split(":");
 
         point = spawn("point",Double.valueOf(parArr[1]) * getAppWidth() , Double.valueOf(parArr[2]) * getAppHeight());
+        point.getComponent(PointComponent.class).setTimeout(Integer.valueOf(parArr[4]));
+        point.getComponent(PointComponent.class).setID(parArr[0]);
+
+
     }
 
     public void onGo(String params) {
@@ -237,6 +243,7 @@ public class TankApp extends GameApplication {
         text.setLayoutY(getAppHeight() / 2.0 - 5);
         Pane p1 = new Pane(rect1, rect2);
         addUINode(p1);
+
         startLevel();
 
         Timeline tl = new Timeline(
@@ -387,12 +394,24 @@ public class TankApp extends GameApplication {
                 gameClient.setErrorHandler(this::onProtocolError);
                 gameClient.connect();
                 gameClient.setPointHandler(this::onPoint);
+                gameClient.setScoreHandler(this::onScore);
             }
         }
 
-        private void onProtocolError (Exception s){
+    private void onScore(String params) {
+        String[] parArr = params.split(":");
+        FXGL.getNotificationService().pushNotification("Your Score: " + parArr[1]);
+        point.removeFromWorld();
+    }
+
+    private void onProtocolError (Exception s){
             getDialogService().showErrorBox(s);
         }
 
 
+    public void pointClicked(Entity entity, String id, long dur) {
+        if (gameClient != null) {
+            gameClient.send("HIT:" + id + ":" + dur);
+        }
     }
+}

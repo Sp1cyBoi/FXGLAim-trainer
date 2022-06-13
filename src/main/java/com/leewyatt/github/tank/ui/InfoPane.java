@@ -21,36 +21,6 @@ import static com.almasb.fxgl.dsl.FXGL.*;
 public class InfoPane extends Pane {
 
     public InfoPane() {
-        TilePane tilePane = new TilePane(10, 10);
-        tilePane.setAlignment(Pos.TOP_LEFT);
-        tilePane.setPrefSize(65, 390);
-        for (int i = 0; i < GameConfig.ENEMY_AMOUNT; i++) {
-            tilePane.getChildren().add(texture("ui/enemy_pre.png"));
-        }
-        tilePane.setLayoutX(25);
-        tilePane.setLayoutY(50);
 
-        Texture levelFlag = texture("ui/levelFlag.png");
-        levelFlag.setLayoutX(25);
-        levelFlag.setLayoutY(460);
-
-        Text levelText = getUIFactoryService().newText("", Color.BLACK, 43);
-        levelText.setLayoutX(38);
-        levelText.setLayoutY(520);
-        levelText.textProperty().bind(getip("level").asString());
-
-        getChildren().addAll(tilePane, levelFlag, levelText);
-        setPrefSize(24 * 6, 24 * 28);
-        setLayoutX(24 * 28);
-        setLayoutY(0);
-        setStyle("-fx-background-color: #ffffff");
-
-        ObservableList<Node> enemyPreNodes = tilePane.getChildren();
-        getip("spawnedEnemy").addListener((ob, ov, nv) -> {
-            for (int i = enemyPreNodes.size() - 1; i >= GameConfig.ENEMY_AMOUNT - nv.intValue(); i--) {
-                enemyPreNodes.get(i).setVisible(false);
-            }
-        });
     }
-
 }
