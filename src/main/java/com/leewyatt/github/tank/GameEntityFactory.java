@@ -33,8 +33,8 @@ public class GameEntityFactory implements EntityFactory {
     public Entity newPoint(SpawnData data) {
         return FXGL.entityBuilder(data)
                 .type(GameType.ENEMY)
-                .bbox(BoundingShape.circle(40))
-                .view("ui/fadenkreuz.png")
+                //.bbox(BoundingShape.circle(40))
+                .viewWithBBox("map/brick.png")
                 .with(new PointComponent())
                 .collidable()
                 .build();

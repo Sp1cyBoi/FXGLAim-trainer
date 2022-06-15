@@ -30,6 +30,10 @@ public class PointComponent extends Component {
     private Instant startTime;
     private String id;
 
+    public PointComponent() {
+        System.out.println("PointComponent constructed");
+    }
+
     @Override
     public void onUpdate(double tpf) {
 
@@ -39,11 +43,11 @@ public class PointComponent extends Component {
     @Override
     public void onAdded() {
         entity.getViewComponent().addOnClickHandler(e -> mouseHandler(e));
-        startTime = Instant.now();
+        entity.setVisible(false);
     }
 
     private void mouseHandler(MouseEvent mouseEvent) {
-       if(entity == null || !entity.isActive()) {
+       if(entity == null || !entity.isActive() || !entity.isVisible()) {
 
        }else {
            ((TankApp)FXGL.getApp()).pointClicked(entity, id, java.time.Duration.between(Instant.now(), startTime).toMillis());
@@ -51,18 +55,31 @@ public class PointComponent extends Component {
 
     }
 
+    @Override
+    public void onRemoved() {
+        System.out.println("OnRemoved");
+        entity.getViewComponent().removeOnClickHandler(e -> mouseHandler(e));
+        super.onRemoved();
+    }
+
     public void setTimeout(Integer dur) {
+        startTime = Instant.now();
+        String lastId = this.id;
         FXGL.runOnce(() -> {
-
-            if (entity != null && entity.isActive()) {
-                entity.removeFromWorld();
+             if (lastId == this.id && entity != null && entity.isActive()) {
+                entity.setVisible(false);
             }
-
-
-        }, Duration.millis(dur));
+       }, Duration.millis(dur));
     }
 
     public void setID(String id) {
         this.id = id;
+    }
+
+    public void show(String s, double x, double y, Integer timeout) {
+        setID(s);
+        entity.setPosition(x,y);
+        entity.setVisible(true);
+        setTimeout(timeout);
     }
 }

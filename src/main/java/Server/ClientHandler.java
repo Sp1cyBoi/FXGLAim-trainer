@@ -1,6 +1,8 @@
 package Server;
 
+import com.almasb.fxgl.dsl.FXGL;
 import javafx.application.Platform;
+import javafx.util.Duration;
 
 import java.io.*;
 import java.net.Socket;
@@ -37,12 +39,14 @@ public class ClientHandler extends Thread{
 
             String s = "";
             while((s = r.readLine()) != null) {
+                System.out.println(this.hashCode() + ": " + s);
                 if( s.startsWith("START:")) {
-                    Platform.runLater(()->{game.startRequest(2, this);});
+                    Platform.runLater(() -> {
+                        game.startRequest(2, this);
+                    });
                 }
                 if( s.startsWith("HIT:")) {
                     String[] par = s.split(":");
-                    System.out.println(this.hashCode() + ": " + s);
                     Platform.runLater(()->{game.hit(this,par[1], Integer.valueOf(par[2]));});
                 }
             }

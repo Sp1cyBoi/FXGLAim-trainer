@@ -1,8 +1,7 @@
 package com.leewyatt.github.tank;
 
-import javafx.application.Platform;
-
-
+import com.almasb.fxgl.dsl.FXGL;
+import javafx.util.Duration;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -17,6 +16,7 @@ public class GameClient {
     private Consumer<Exception> errorHandler;
     private Consumer<String> pointHandler;
     private Consumer<String> scoreHandler;
+    private  Consumer<String>  finalScoreHandler;
 
     public GameClient(String serverIp, int i) {
         this.serverIp = serverIp;
@@ -38,25 +38,30 @@ public class GameClient {
                     r = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String s = "";
                     while ((s = r.readLine()) != null) {
+                        System.out.println("Client:" + s);
                         if (s.startsWith("GO")) {
-                            Platform.runLater(()->{this.goHandler.accept("");});
+                            FXGL.runOnce(()->{this.goHandler.accept("");}, Duration.millis(0));
                         }
                         if (s.startsWith("WAIT:")) {
                             String params = s.substring(5);
-                            Platform.runLater(()->{this.waitHandler.accept(params);});
+                            FXGL.runOnce(()->{this.waitHandler.accept(params);}, Duration.millis(0));
                         }
                         if (s.startsWith("POINT:")) {
                             String params = s.substring(6);
-                            Platform.runLater(()->{this.pointHandler.accept(params);});
+                            FXGL.runOnce(()->{this.pointHandler.accept(params);}, Duration.millis(0));
                         }
                         if (s.startsWith("SCORE:")) {
                             String params = s.substring(6);
-                            Platform.runLater(()->{this.scoreHandler.accept(params);});
+                            FXGL.runOnce(()->{this.scoreHandler.accept(params);}, Duration.millis(0));
+                        }
+                        if (s.startsWith("FINALSCORE:")) {
+                            String params = s.substring(11);
+                            FXGL.runOnce(()->{this.finalScoreHandler.accept(params);}, Duration.millis(0));
                         }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Platform.runLater(()->{ errorHandler.accept(e);});
+                    FXGL.runOnce(()->{ errorHandler.accept(e);}, Duration.millis(0));
 
                 }
                 System.out.println("After client  read loop");
@@ -64,7 +69,7 @@ public class GameClient {
         } catch (UnknownHostException ex) {
 
             System.out.println("Server not found: " + ex.getMessage());
-            Platform.runLater(()->{ errorHandler.accept(ex);});
+            FXGL.runOnce(()->{ errorHandler.accept(ex);}, Duration.millis(0));
 
         } catch (IOException exc) {
             exc.printStackTrace();
@@ -90,6 +95,10 @@ public class GameClient {
 
     public void setScoreHandler(Consumer<String> consumer) {
         this.scoreHandler = consumer;
+    }
+
+    public void setFinalScoreHandler(Consumer<String> consumer) {
+        this.finalScoreHandler = consumer;
     }
 
     public void start() {

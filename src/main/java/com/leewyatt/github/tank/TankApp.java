@@ -14,8 +14,8 @@ import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.level.Level;
 import com.almasb.fxgl.entity.level.tiled.TMXLevelLoader;
+import com.almasb.fxgl.notification.NotificationService;
 import com.almasb.fxgl.time.TimerAction;
-import com.leewyatt.github.tank.collision.*;
 import com.leewyatt.github.tank.components.PlayerComponent;
 import com.leewyatt.github.tank.components.PointComponent;
 import com.leewyatt.github.tank.effects.HelmetEffect;
@@ -98,7 +98,7 @@ public class TankApp extends GameApplication {
         settings.setMainMenuEnabled(true);
         settings.setGameMenuEnabled(true);
         settings.getCSSList().add("tankApp.css");
-        settings.setDefaultCursor(new CursorInfo("ui/cursor.png", 0, 0));
+        settings.setDefaultCursor(new CursorInfo("ui/fadenkreuz.png", 20, 20));
         //FPS,CPU,RAM等信息的显示
         //settings.setProfilingEnabled(true);
         //开发模式.这样可以输出较多的日志异常追踪
@@ -132,64 +132,19 @@ public class TankApp extends GameApplication {
         } else {
             vars.put("level", 1);
         }
-        vars.put("playerBulletLevel", 1);
-        vars.put("freezingEnemy", false);
-        vars.put("destroyedEnemy", 0);
-        vars.put("spawnedEnemy", 0);
         vars.put("gameOver", false);
     }
 
     @Override
     protected void initInput() {
-        onKey(KeyCode.W, this::moveUpAction);
-        onKey(KeyCode.UP, this::moveUpAction);
 
-        onKey(KeyCode.S, this::moveDownAction);
-        onKey(KeyCode.DOWN, this::moveDownAction);
-
-        onKey(KeyCode.A, this::moveLeftAction);
-        onKey(KeyCode.LEFT, this::moveLeftAction);
-
-        onKey(KeyCode.D, this::moveRightAction);
-        onKey(KeyCode.RIGHT, this::moveRightAction);
-
-        onBtn(MouseButton.PRIMARY, this::shootAction);
+        //onBtn(MouseButton.PRIMARY, this::shootAction);
     }
 
 
-    private boolean tankIsReady() {
-        return player != null && playerComponent != null && !getb("gameOver") && player.isActive();
-    }
 
-    private void shootAction() {
-        if (tankIsReady()) {
-            playerComponent.shoot();
-        }
-    }
 
-    private void moveRightAction() {
-        if (tankIsReady()) {
-            playerComponent.right();
-        }
-    }
 
-    private void moveLeftAction() {
-        if (tankIsReady()) {
-            playerComponent.left();
-        }
-    }
-
-    private void moveDownAction() {
-        if (tankIsReady()) {
-            playerComponent.down();
-        }
-    }
-
-    private void moveUpAction() {
-        if (tankIsReady()) {
-            playerComponent.up();
-        }
-    }
 
     @Override
     protected void initGame() {
@@ -198,7 +153,7 @@ public class TankApp extends GameApplication {
         getGameWorld().addEntityFactory(new GameEntityFactory());
         Pane root = getGameScene().getRoot();
         buildAndStartLevel();
-        getip("destroyedEnemy").addListener((ob, ov, nv) -> {
+        /*getip("destroyedEnemy").addListener((ob, ov, nv) -> {
             if (nv.intValue() == GameConfig.ENEMY_AMOUNT) {
                 set("gameOver", true);
                 play("Win.wav");
@@ -206,16 +161,10 @@ public class TankApp extends GameApplication {
                         () -> getSceneService().pushSubScene(successSceneLazyValue.get()),
                         Duration.seconds(1.5));
             }
-        });
+        });*/
     }
 
     public void buildAndStartLevel() {
-        //1. 清理上一个关卡的残留(这里主要是清理声音残留)
-        //清理关卡的残留(这里主要是清理声音残留)
-        getGameWorld().getEntitiesByType(
-                GameType.BULLET, GameType.ENEMY, GameType.PLAYER
-        ).forEach(Entity::removeFromWorld);
-
         connectToServer();
         gameClient.start();
 
@@ -224,14 +173,16 @@ public class TankApp extends GameApplication {
     public void onPoint(String params) {
         String[] parArr = params.split(":");
 
-        point = spawn("point",Double.valueOf(parArr[1]) * getAppWidth() , Double.valueOf(parArr[2]) * getAppHeight());
-        point.getComponent(PointComponent.class).setTimeout(Integer.valueOf(parArr[4]));
-        point.getComponent(PointComponent.class).setID(parArr[0]);
+         point.getComponent(PointComponent.class).show(parArr[0],Double.valueOf(parArr[1]) * getAppWidth() , Double.valueOf(parArr[2]) * getAppHeight(), Integer.valueOf(parArr[4]));
 
 
     }
 
     public void onGo(String params) {
+
+
+
+        startLevel();
 
         Rectangle rect1 = new Rectangle(getAppWidth(), getAppHeight() / 2.0, Color.web("#333333"));
         Rectangle rect2 = new Rectangle(getAppWidth(), getAppHeight() / 2.0, Color.web("#333333"));
@@ -243,9 +194,6 @@ public class TankApp extends GameApplication {
         text.setLayoutY(getAppHeight() / 2.0 - 5);
         Pane p1 = new Pane(rect1, rect2);
         addUINode(p1);
-
-        startLevel();
-
         Timeline tl = new Timeline(
                 new KeyFrame(Duration.seconds(1.2),
                         new KeyValue(rect1.translateYProperty(), -getAppHeight() / 2.0),
@@ -267,84 +215,18 @@ public class TankApp extends GameApplication {
         }
 
         private void startLevel () {
-
-
             setLevelFromMap("level1.tmx");
 
             play("start.wav");
-            player = null;
-            player = spawn("player", 9 * 24 + 3, 25 * 24);
-            //每局开始玩家坦克都有无敌保护时间
-            player.getComponent(EffectComponent.class).startEffect(new HelmetEffect());
-            playerComponent = player.getComponent(PlayerComponent.class);
-            //显示信息的UI
-            getGameScene().addGameView(new GameView(new InfoPane(), 100));
-            //首先产生几个敌方坦克
+
+            //getGameScene().addGameView(new GameView(new InfoPane(), 100));
+
+            point = spawn("point",0,0);
+
         }
 
-        @Override
-        protected void initPhysics () {
-            getPhysicsWorld().addCollisionHandler(new BulletEnemyHandler());
-            getPhysicsWorld().addCollisionHandler(new BulletPlayerHandler());
-            BulletBrickHandler bulletBrickHandler = new BulletBrickHandler();
-            getPhysicsWorld().addCollisionHandler(bulletBrickHandler);
-            getPhysicsWorld().addCollisionHandler(bulletBrickHandler.copyFor(GameType.BULLET, GameType.STONE));
-            getPhysicsWorld().addCollisionHandler(bulletBrickHandler.copyFor(GameType.BULLET, GameType.GREENS));
-            getPhysicsWorld().addCollisionHandler(new BulletFlagHandler());
-            getPhysicsWorld().addCollisionHandler(new BulletBorderHandler());
-            getPhysicsWorld().addCollisionHandler(new BulletBulletHandler());
-            getPhysicsWorld().addCollisionHandler(new PlayerItemHandler());
-        }
 
-        public void freezingEnemy () {
-            expireAction(freezingTimerAction);
-            set("freezingEnemy", true);
-            freezingTimerAction = runOnce(() -> {
-                set("freezingEnemy", false);
-            }, GameConfig.STOP_MOVE_TIME);
-        }
 
-        public void spadeBackUpBase () {
-            expireAction(spadeTimerAction);
-            //升级基地周围为石头墙
-            updateWall(true);
-            spadeTimerAction = runOnce(() -> {
-                //基地周围的墙,还原成砖头墙
-                updateWall(false);
-            }, GameConfig.SPADE_TIME);
-        }
-
-        /**
-         * 基地四周的防御
-         * 按照游戏规则: 默认是砖头墙, 吃了铁锨后,升级成为石头墙;
-         */
-        private void updateWall ( boolean isStone){
-            //循环找到包围基地周围的墙
-            for (int row = 0; row < 3; row++) {
-                for (int col = 0; col < 4; col++) {
-                    if (row != 0 && (col == 1 || col == 2)) {
-                        continue;
-                    }
-                    //删除旧的墙
-                    List<Entity> entityTempList = getGameWorld().getEntitiesAt(new Point2D(288 + col * 24, 576 + row * 24));
-                    for (Entity entityTemp : entityTempList) {
-                        Serializable type = entityTemp.getType();
-                        //如果是玩家自建的地图, 那么需要判断是不是水面草地雪地等
-                        if (type == GameType.STONE || type == GameType.BRICK || type == GameType.SNOW || type == GameType.SEA || type == GameType.GREENS) {
-                            if (entityTemp.isActive()) {
-                                entityTemp.removeFromWorld();
-                            }
-                        }
-                    }
-                    //创建新的墙
-                    if (isStone) {
-                        spawn("itemStone", new SpawnData(288 + col * 24, 576 + row * 24));
-                    } else {
-                        spawn("brick", new SpawnData(288 + col * 24, 576 + row * 24));
-                    }
-                }
-            }
-        }
 
         /**
          * 让TimeAction过期
@@ -395,15 +277,22 @@ public class TankApp extends GameApplication {
                 gameClient.connect();
                 gameClient.setPointHandler(this::onPoint);
                 gameClient.setScoreHandler(this::onScore);
+                gameClient.setFinalScoreHandler(this::onFinalScore);
             }
         }
 
     private void onScore(String params) {
         String[] parArr = params.split(":");
-        FXGL.getNotificationService().pushNotification("Your Score: " + parArr[1]);
-        point.removeFromWorld();
+        FXGL.getNotificationService().pushNotification("Your Score: " + parArr[1] + " Opponent: " + parArr[3]);
+        point.setVisible(false);
     }
 
+    private void onFinalScore(String params) {
+        String[] parArr = params.split(":");
+        FXGL.getNotificationService().pushNotification("Final Score: " + parArr[1] + " Opponent: " + parArr[3]);
+        point.setVisible(false);
+        FXGL.runOnce( ()->getGameController().gotoMainMenu(), Duration.seconds(6));
+    }
     private void onProtocolError (Exception s){
             getDialogService().showErrorBox(s);
         }
