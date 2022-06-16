@@ -48,9 +48,7 @@ import java.util.Random;
 
 import static com.almasb.fxgl.dsl.FXGL.*;
 
-/**
- * @author LeeWyatt
- */
+
 public class TankApp extends GameApplication {
 
     private static String serverIp;
@@ -62,22 +60,13 @@ public class TankApp extends GameApplication {
     public LazyValue<FailedScene> failedSceneLazyValue = new LazyValue<>(FailedScene::new);
     private LazyValue<SuccessScene> successSceneLazyValue = new LazyValue<>(SuccessScene::new);
 
-    /**
-     * 顶部的三个点,用于产生敌军坦克
-     */
+
     private int[] enemySpawnX = {30, 295 + 30, 589 + 20};
 
-    /**
-     * 基地加固定时器动作
-     */
     private TimerAction spadeTimerAction;
-    /**
-     * 敌军冻结计的定时器动作
-     */
+
     private TimerAction freezingTimerAction;
-    /**
-     * 定时刷新敌军坦克
-     */
+
     private TimerAction spawnEnemyTimerAction;
     private Entity point;
 
@@ -99,26 +88,23 @@ public class TankApp extends GameApplication {
         settings.setGameMenuEnabled(true);
         settings.getCSSList().add("tankApp.css");
         settings.setDefaultCursor(new CursorInfo("ui/fadenkreuz.png", 20, 20));
-        //FPS,CPU,RAM等信息的显示
-        //settings.setProfilingEnabled(true);
-        //开发模式.这样可以输出较多的日志异常追踪
-        //settings.setApplicationMode(ApplicationMode.DEVELOPER);
+
         settings.setSceneFactory(new SceneFactory() {
             @Override
             public StartupScene newStartup(int width, int height) {
-                //自定义启动场景
+
                 return new GameStartupScene(width, height);
             }
 
             @Override
             public FXGLMenu newMainMenu() {
-                //主菜单场景
+
                 return new GameMainMenu();
             }
 
             @Override
             public LoadingScene newLoadingScene() {
-                //游戏前的加载场景
+
                 return new GameLoadingScene();
             }
 
@@ -205,7 +191,7 @@ public class TankApp extends GameApplication {
         pt.setOnFinished(e -> {
             text.setVisible(false);
             tl.play();
-            //3. 开始新关卡
+
 
         });
         pt.play();
@@ -228,9 +214,7 @@ public class TankApp extends GameApplication {
 
 
 
-        /**
-         * 让TimeAction过期
-         */
+
         public void expireAction (TimerAction action){
             if (action == null) {
                 return;

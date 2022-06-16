@@ -23,22 +23,14 @@ import java.util.Locale;
 
 import static com.almasb.fxgl.dsl.FXGL.*;
 
-/**
- * @author LeeWyatt
- * 自定义创建地图的场景
- */
+
 public class ConstructPane extends BorderPane {
 
     private Canvas canvas;
-    /**
-     * width=24  height=24
-     */
+
     private static final int CELL_SIZE = 24;
 
-    /**
-     * map real row = 26+ (top border wall)1 + 1(bottom border wall) = 28
-     * map real col = 26+ (left border wall)1 + 1(right border wall) = 28
-     */
+
     private static final int ROW = 26;
     private static final int COL = 26;
     private final ImageView previewImgView;
@@ -167,7 +159,6 @@ public class ConstructPane extends BorderPane {
                     if (map[j][i] == GameType.BRICK) {
                         grid = " gid=\"1\"";
                     } else if (map[j][i] == GameType.SEA) {
-                        //SEA ,不是object img 是普通的object 所以 i+1
                         y = (i + 1) * CELL_SIZE;
                         grid = "";
                     } else if (map[j][i] == GameType.SNOW) {
@@ -177,8 +168,6 @@ public class ConstructPane extends BorderPane {
                     } else if (map[j][i] == GameType.GREENS) {
                         grid = " gid=\"5\"";
                     }
-                    //因为有边框,所以x方向是 j+1.
-                    //object 里的图像对象在Tiled软件里记录是左下角的坐标,而不是左上角的坐标,所以 i+1+1
 
                     list.add(String.format(
                             "  <object id=\"%d\" type=\"%s\"%s x=\"%d\" y=\"%d\" width=\"24\" height=\"24\"/>",
@@ -188,16 +177,13 @@ public class ConstructPane extends BorderPane {
             }
         }
         list.addAll(text("levelEnd.txt"));
-        //保存地图tmx文件,并开始游戏
         getFileSystemService()
-                //保存地图数据tmx文件
                 .writeDataTask(list, GameConfig.CUSTOM_LEVEL_PATH)
                 .onSuccess(e -> {
                     set("level", 0);
                     if (startGame) {
                         getGameController().startNewGame();
                     }
-                    //保存地图数据(二维数组对象)
                     saveMapData();
                 })
                 .run();
@@ -233,11 +219,9 @@ public class ConstructPane extends BorderPane {
     }
 
     private void resetMapData() {
-        //default empty 默认值为空
         for (GameType[] gameTypes : map) {
             Arrays.fill(gameTypes, GameType.EMPTY);
         }
-        //对基地周围默认有墙
         map[11][23] = GameType.BRICK;
         map[12][23] = GameType.BRICK;
         map[13][23] = GameType.BRICK;
@@ -248,9 +232,7 @@ public class ConstructPane extends BorderPane {
         map[14][25] = GameType.BRICK;
     }
 
-    /**
-     * Mouse handling on canvas 画布上面的鼠标处理
-     */
+
     private void canvasAddMouseAction() {
         canvas.setOnMouseClicked(e -> updateMapView(e.getX(), e.getY()));
         canvas.setOnMouseDragged(e -> updateMapView(e.getX(), e.getY()));
@@ -261,10 +243,9 @@ public class ConstructPane extends BorderPane {
         canvas.setOnMouseMoved(e -> {
             int x = (int) e.getX() / CELL_SIZE;
             int y = (int) e.getY() / CELL_SIZE;
-            if (x < 0 || y < 0 || x > 25 || y > 25) {// 拖动的话,鼠标可能移除界面
+            if (x < 0 || y < 0 || x > 25 || y > 25) {
                 return;
             }
-            // 鼠标位置的绘制
             previewImgView.setImage(image("map/" + this.gameType.toString().toLowerCase(Locale.ROOT) + (isBig ? "4" : "") + ".png"));
             previewImgView.setLayoutX(x * CELL_SIZE);
             previewImgView.setLayoutY(y * CELL_SIZE);
@@ -276,14 +257,12 @@ public class ConstructPane extends BorderPane {
     private void updateMapView(double dx, double dy) {
         int x = (int) dx / 24;
         int y = (int) dy / 24;
-        if (x < 0 || y < 0 || x > 25 || y > 25) {// 虽然这里的移动没有问题,但如果是拖动的话,鼠标可能移除界面出现负数或者大数
+        if (x < 0 || y < 0 || x > 25 || y > 25) {
             return;
         }
-        // 鼠标位置的赋值 (基地位置除外)
         if (!(x >= 12 && x <= 13 && y >= 24)) {
             map[x][y] = gameType;
         }
-        // 如果是大图,还需要判断其他3个位置是否可以赋值
         if (isBig) {
             if (x + 1 <= 25 && !(x + 1 >= 12 && x + 1 <= 13 && y >= 24)) {
                 map[x + 1][y] = gameType;
@@ -302,11 +281,7 @@ public class ConstructPane extends BorderPane {
         }
     }
 
-    /**
-     * @param type  Tile Image Type/ GameType
-     * @param isBig true 2*2 big image ; false 1*1 normal image
-     * @return Img Button
-     */
+
     private Button creatTileBtn(GameType type, boolean isBig) {
         Button btn = new Button();
         btn.getStyleClass().add("tile-btn");
@@ -332,13 +307,10 @@ public class ConstructPane extends BorderPane {
         GraphicsContext g = canvas.getGraphicsContext2D();
         g.setFill(Color.WHITE);
         g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        //draw grid 绘制直线网格
         if (showGrid) {
             drawGrid(g);
         }
-        //draw map tiles 绘制地图元素
         drawTiles(g);
-        //draw flag 绘制旗帜
         g.drawImage(image("map/flag.png"), 12 * CELL_SIZE, 24 * CELL_SIZE);
     }
 

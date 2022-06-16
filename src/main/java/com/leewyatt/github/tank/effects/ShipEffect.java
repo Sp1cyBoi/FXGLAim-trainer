@@ -6,10 +6,7 @@ import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.texture.Texture;
 import javafx.util.Duration;
 
-/**
- * @author LeeWyatt
- * 玩家获得船的效果
- */
+
 public class ShipEffect extends Effect {
     private final Texture shipTexture;
     public ShipEffect() {

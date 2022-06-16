@@ -16,10 +16,7 @@ import javafx.util.Duration;
 import static com.almasb.fxgl.dsl.FXGL.*;
 import static com.almasb.fxgl.dsl.FXGL.inc;
 
-/**
- * @author LeeWyatt
- * 成功过关场景
- */
+
 public class SuccessScene extends SubScene {
     private final PauseTransition pt;
     public SuccessScene() {
@@ -63,7 +60,6 @@ public class SuccessScene extends SubScene {
 
     @Override
     public void onCreate() {
-        //清理关卡的残留(这里主要是清理声音残留)
         getGameWorld().getEntitiesByType(GameType.BULLET, GameType.ENEMY, GameType.PLAYER).forEach(Entity::removeFromWorld);
         pt.play();
     }

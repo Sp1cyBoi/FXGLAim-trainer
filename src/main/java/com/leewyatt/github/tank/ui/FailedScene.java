@@ -11,10 +11,7 @@ import javafx.util.Duration;
 
 import static com.almasb.fxgl.dsl.FXGL.*;
 
-/**
- * @author LeeWyatt
- * 失败后的场景
- */
+
 public class FailedScene extends SubScene {
 
     private final TranslateTransition tt;
@@ -32,7 +29,6 @@ public class FailedScene extends SubScene {
         tt.setOnFinished(e -> {
             FXGL.getSceneService().popSubScene();
             gameOverTexture.setTranslateY(getAppHeight() - gameOverTexture.getHeight() + 24);
-            //清理关卡的残留(这里主要是清理声音残留)
             getGameWorld().getEntitiesByType(
                     GameType.BULLET, GameType.ENEMY, GameType.PLAYER
             ).forEach(Entity::removeFromWorld);

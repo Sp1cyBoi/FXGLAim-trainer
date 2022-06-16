@@ -22,10 +22,7 @@ import javafx.util.Duration;
 import static com.almasb.fxgl.dsl.FXGL.*;
 import static javafx.scene.input.KeyCode.*;
 
-/**
- * @author LeeWyatt
- * 游戏的主菜单场景
- */
+
 public class GameMainMenu extends FXGLMenu {
 
     private final TranslateTransition tt;
@@ -93,9 +90,7 @@ public class GameMainMenu extends FXGLMenu {
         tt.play();
     }
 
-    /**
-     * 显示玩家使用帮助.比如如何移动坦克,如何发射子弹
-     */
+
     private void instructions() {
         GridPane pane = new GridPane();
         pane.setHgap(20);

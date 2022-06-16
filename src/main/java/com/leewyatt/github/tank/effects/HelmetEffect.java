@@ -8,10 +8,7 @@ import com.almasb.fxgl.texture.AnimationChannel;
 import com.leewyatt.github.tank.GameConfig;
 import javafx.util.Duration;
 
-/**
- * @author LeeWyatt
- * 玩家获得无敌道具的效果
- */
+
 public class HelmetEffect extends Effect {
     private final AnimatedTexture helmetAnimTexture;
 

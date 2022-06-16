@@ -21,11 +21,7 @@ import java.util.Random;
 
 import static com.leewyatt.github.tank.GameType.*;
 
-/**
- * @author LeeWyatt
- * 敌人坦克的行为,随机移动, 遇见障碍物, 1. 提高射击的几率;(帮助敌人打开更多的土墙)
- *                               2. 提高转弯的几率;(帮助敌人避开石头,水面等)
- */
+
 public class EnemyComponent extends Component {
     private BoundingBoxComponent bbox;
     private LocalTimer shootTimer = FXGL.newLocalTimer();
@@ -34,9 +30,7 @@ public class EnemyComponent extends Component {
     private Dir moveDir;
     private LazyValue<EntityGroup> blocks = new LazyValue<>(() -> entity.getWorld().getGroup(BRICK, FLAG, SEA, STONE, ENEMY, PLAYER, BORDER_WALL));
 
-    /**
-     * 变成坦克前3秒不能动
-     */
+
     private boolean canMove;
     private static AnimationChannel ac = new AnimationChannel(FXGL.image("tank/spawnTank.png"), Duration.seconds(0.4), 4);
 
@@ -131,7 +125,6 @@ public class EnemyComponent extends Component {
         int length = Math.round(velocity.length());
         velocity.normalizeLocal();
 
-        // 应该优化
         List<Entity> blockList = blocks.get().getEntitiesCopy();
         for (int i = 0; i < length; i++) {
             entity.translate(velocity.x, velocity.y);
@@ -149,11 +142,9 @@ public class EnemyComponent extends Component {
             }
             if (collision) {
                 entity.translate(-velocity.x, -velocity.y);
-                //碰撞后增加开火几率; Increase the chance of firing after a collision
                 if (FXGLMath.randomBoolean(0.6)) {
                     shoot();
                 }
-                //碰撞后增加改变方向的几率;Increase the chance of changing direction after collision;
                 if (FXGLMath.randomBoolean(0.3)) {
                     setMoveDir(Dir.values()[random.nextInt(4)]);
                 }

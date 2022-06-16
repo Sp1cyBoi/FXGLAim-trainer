@@ -33,7 +33,6 @@ public class GameEntityFactory implements EntityFactory {
     public Entity newPoint(SpawnData data) {
         return FXGL.entityBuilder(data)
                 .type(GameType.ENEMY)
-                //.bbox(BoundingShape.circle(40))
                 .viewWithBBox("map/brick.png")
                 .with(new PointComponent())
                 .collidable()
@@ -42,18 +41,14 @@ public class GameEntityFactory implements EntityFactory {
 
     @Spawns("player")
     public Entity newPlayer(SpawnData data) {
-        //生命值组件
         HealthIntComponent hpComponent = new HealthIntComponent(GameConfig.PLAYER_HEALTH);
-        //进度条(生命值)
         ProgressBar hpView = new ProgressBar(false);
         hpView.setFill(Color.LIGHTGREEN);
         hpView.setMaxValue(GameConfig.PLAYER_HEALTH);
         hpView.setWidth(35);
         hpView.setHeight(8);
         hpView.setTranslateY(42);
-        //进度条的值和生命值组件的值绑定
         hpView.currentValueProperty().bind(hpComponent.valueProperty());
-        //生命值不同,生命值进度条颜色不同
         hpComponent.valueProperty().addListener((ob, ov, nv) -> {
             int hpValue = nv.intValue();
             if (hpValue >= GameConfig.PLAYER_HEALTH * 0.7) {
@@ -165,7 +160,6 @@ public class GameEntityFactory implements EntityFactory {
                 .viewWithBBox(animatedTexture)
                 .collidable()
                 .build();
-        //在最后的几秒,会闪烁提示玩家, 基地的保护时间即将过期
         FXGL.runOnce(animatedTexture::loop, GameConfig.SPADE_NORMAL_TIME);
         return entity;
     }
@@ -176,7 +170,6 @@ public class GameEntityFactory implements EntityFactory {
         String textureStr;
         Entity owner = data.get("owner");
         CollidableComponent collidableComponent = new CollidableComponent(true);
-        //检测碰撞, 忽略同类;Detect collisions, ignore the same type;
         collidableComponent.addIgnoredType(owner.getType());
         if (GameType.PLAYER == owner.getType()) {
             int bulletLevel = FXGL.geti("playerBulletLevel");
@@ -224,7 +217,6 @@ public class GameEntityFactory implements EntityFactory {
 
     @Spawns("item")
     public Entity newItem(SpawnData data) {
-        //1帧图片. 产生闪烁的效果,有"投机取巧"之嫌,以后可能使用2帧的图片替换
         AnimationChannel ac = new AnimationChannel(FXGL.image("item/" + data.<ItemType>get("itemType").toString().toLowerCase() + ".png"), 1, 30, 28, Duration.seconds(.5), 0, 1);
         AnimatedTexture animatedTexture = new AnimatedTexture(ac);
         Entity entity = FXGL.entityBuilder(data)
